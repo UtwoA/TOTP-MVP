@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: radius-totp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: radius_totp
+      POSTGRES_USER: radius_totp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U radius_totp -d radius_totp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  radius-totp:
+    build: .
+    container_name: radius-totp-service
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "1812:1812/udp"
+
+volumes:
+  postgres_data:

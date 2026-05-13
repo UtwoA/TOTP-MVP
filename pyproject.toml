@@ -1,0 +1,33 @@
+[project]
+name = "radius-totp-2fa"
+version = "0.1.0"
+description = "RADIUS 2FA TOTP service for VPN, RD Gateway, and remote access with Active Directory validation."
+requires-python = ">=3.11"
+dependencies = [
+    "cryptography>=42.0.0",
+    "ldap3>=2.9.1",
+    "psycopg[binary]>=3.1.18",
+    "pyrad>=2.4",
+    "pyotp>=2.9.0",
+    "qrcode[pil]>=7.4.2",
+    "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0.0",
+]
+
+[project.scripts]
+radius-totp = "radius_totp.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/radius_totp"]
